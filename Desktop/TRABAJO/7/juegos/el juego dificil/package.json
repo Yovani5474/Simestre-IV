@@ -1,0 +1,15 @@
+{
+  "name": "el-juego-dificil-typescript",
+  "version": "1.0.0",
+  "description": "El juego más difícil del mundo con control por gestos - TypeScript",
+  "main": "dist/gesture-game.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "python -m http.server 8000"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/dom-mediacapture-record": "^1.0.0"
+  }
+}

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>El Juego Más Difícil del Mundo - Control por Gestos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="cameraPermission">
+        <h2>🎮 Control por Gestos</h2>
+        <p>Este juego usa reconocimiento de gestos con tu cámara</p>
+        <p><strong>Gestos de control:</strong></p>
+
+        <button class="permission-button" onclick="startCamera()">Activar Cámara y Jugar</button>
+        <button class="permission-button" onclick="playWithoutCamera()">Jugar sin Gestos</button>
+    </div>
+
+    <!-- Menú de Selección de Niveles -->
+    <div id="levelMenu" style="display: none;">
+        <div id="levelMenuTitle">🎮 SELECCIÓN DE NIVELES</div>
+        <div id="levelGrid">
+            <!-- Los niveles se generarán dinámicamente -->
+        </div>
+        <div id="levelMenuButtons">
+            <button class="menu-button" onclick="showGame()">🎯 JUGAR</button>
+            <button class="menu-button" onclick="resetProgress()">🔄 REINICIAR PROGRESO</button>
+        </div>
+    </div>
+
+    <!-- Menú de Ajustes -->
+    <div id="settingsMenu" style="display: none;">
+        <div id="settingsTitle">⚙️ AJUSTES</div>
+
+        <!-- Sección de Audio -->
+        <div class="settings-section">
+            <h3>🔊 Audio</h3>
+            <div class="setting-item">
+                <span class="setting-label">Sonidos del juego</span>
+                <div class="setting-control">
+                    <div class="toggle-switch active" id="soundToggle" onclick="toggleSound()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Volumen general</span>
+                <div class="setting-control">
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50"
+                        onchange="changeVolume(this.value)">
+                    <span id="volumeValue">50%</span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Efectos de sonido</span>
+                <div class="setting-control">
+                    <div class="toggle-switch active" id="sfxToggle" onclick="toggleSFX()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Controles -->
+        <div class="settings-section">
+            <h3>🎮 Controles</h3>
+            <div class="setting-item">
+                <span class="setting-label">Modo de control principal</span>
+                <div class="setting-control">
+                    <select id="controlModeSelect" onchange="changeControlMode(this.value)"
+                        style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 5px;">
+                        <option value="hybrid">🔄 Híbrido (Todos)</option>
+                        <option value="gestures">👋 Solo Gestos</option>
+                        <option value="touch">👆 Solo Táctil</option>
+                        <option value="keyboard">⌨️ Solo Teclado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Mostrar indicadores de gestos</span>
+                <div class="setting-control">
+                    <div class="toggle-switch active" id="gestureIndicatorToggle" onclick="toggleGestureIndicators()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Sensibilidad de gestos</span>
+                <div class="setting-control">
+                    <input type="range" class="volume-slider" id="sensitivitySlider" min="1" max="10" value="5"
+                        onchange="changeSensitivity(this.value)">
+                    <span id="sensitivityValue">5</span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Sensibilidad táctil</span>
+                <div class="setting-control">
+                    <input type="range" class="volume-slider" id="touchSensitivitySlider" min="1" max="10" value="5"
+                        onchange="changeTouchSensitivity(this.value)">
+                    <span id="touchSensitivityValue">5</span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Controles disponibles</span>
+                <div class="setting-control">
+                    <span class="control-key">WASD</span>
+                    <span class="control-key">SPACE</span>
+                    <span class="control-key">👋</span>
+                    <span class="control-key">👆</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Apariencia -->
+        <div class="settings-section">
+            <h3>🎨 Apariencia</h3>
+            <div class="setting-item">
+                <span class="setting-label">Tema visual</span>
+                <div class="setting-control">
+                    <div class="theme-selector">
+                        <div class="theme-option theme-dark active" data-theme="dark" onclick="changeTheme('dark')">🌙
+                        </div>
+                        <div class="theme-option theme-light" data-theme="light" onclick="changeTheme('light')">☀️</div>
+                        <div class="theme-option theme-neon" data-theme="neon" onclick="changeTheme('neon')">⚡</div>
+                        <div class="theme-option theme-retro" data-theme="retro" onclick="changeTheme('retro')">🌈</div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Efectos visuales</span>
+                <div class="setting-control">
+                    <div class="toggle-switch active" id="effectsToggle" onclick="toggleEffects()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Mostrar FPS</span>
+                <div class="setting-control">
+                    <div class="toggle-switch" id="fpsToggle" onclick="toggleFPS()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Juego -->
+        <div class="settings-section">
+            <h3>🎯 Juego</h3>
+            <div class="setting-item">
+                <span class="setting-label">Dificultad</span>
+                <div class="setting-control">
+                    <select id="difficultySelect" onchange="changeDifficulty(this.value)"
+                        style="background: #333; color: #fff; border: 1px solid #555; padding: 5px; border-radius: 5px;">
+                        <option value="easy">Fácil</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Difícil</option>
+                        <option value="extreme">Extremo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Velocidad de hipervelocidad</span>
+                <div class="setting-control">
+                    <input type="range" class="volume-slider" id="hyperSpeedSlider" min="5" max="15" value="8"
+                        onchange="changeHyperSpeed(this.value)">
+                    <span id="hyperSpeedValue">8x</span>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Auto-guardar progreso</span>
+                <div class="setting-control">
+                    <div class="toggle-switch active" id="autoSaveToggle" onclick="toggleAutoSave()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Misiones -->
+        <div class="settings-section">
+            <h3>🏆 Misiones</h3>
+            <div class="setting-item">
+                <span class="setting-label">Mostrar notificaciones de misiones</span>
+                <div class="setting-control">
+                    <div class="toggle-switch active" id="missionNotificationsToggle"
+                        onclick="toggleMissionNotifications()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Ver progreso de misiones</span>
+                <div class="setting-control">
+                    <button class="menu-button" onclick="showMissions()">📋 VER MISIONES</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones del menú -->
+        <div class="settings-buttons">
+            <button class="menu-button" onclick="resetSettings()">🔄 RESTAURAR</button>
+            <button class="menu-button" onclick="closeSettings()">✅ GUARDAR</button>
+        </div>
+    </div>
+
+    <div id="gameContainer">
+        <div id="title">EL JUEGO MÁS DIFÍCIL - CONTROL POR GESTOS</div>
+        <div id="gameHeader">
+            <div>
+                <button class="menu-button" onclick="showLevelMenu()">📋 NIVELES</button>
+                <button class="menu-button" onclick="showSettings()">⚙️ AJUSTES</button>
+            </div>
+            <div id="levelInfo">
+                <span>Nivel: <span id="currentLevel">1</span></span>
+                <span>Mejor Tiempo: <span id="bestTime">--</span></span>
+            </div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <!-- Contenedor de la cámara -->
+        <div id="cameraContainer" style="display: none;">
+            <video id="videoElement" autoplay muted playsinline></video>
+        </div>
+
+
+
+        <div id="ui">
+            <div class="stat">Nivel: <span id="level">1</span></div>
+            <div class="stat">Muertes: <span id="deaths">0</span></div>
+            <div class="stat">Tiempo: <span id="time">0</span></div>
+            <div class="stat">Puntos: <span id="score">0</span></div>
+            <div class="stat">Combo: <span id="combo">0</span>x</div>
+        </div>
+
+        <!-- Power-up Status Display -->
+        <div id="powerUpStatus"
+            style="position: fixed; top: 170px; left: 10px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; border: 2px solid #00ff88; display: none; z-index: 1000;">
+            <div style="color: #00ff88; font-size: 14px; margin-bottom: 5px;">⚡ POWER-UPS ACTIVOS</div>
+            <div id="shieldStatus" style="display: none; color: #00ffff; font-size: 12px;">🛡️ Escudo: <span
+                    id="shieldTime">0</span>s</div>
+            <div id="speedStatus" style="display: none; color: #ff8800; font-size: 12px;">🚀 Velocidad: <span
+                    id="speedTime">0</span>s</div>
+            <div id="slowMotionStatus" style="display: none; color: #8800ff; font-size: 12px;">⏰ Cámara Lenta: <span
+                    id="slowTime">0</span>s</div>
+        </div>
+        <div id="instructions">
+            <strong>Controles:</strong><br>
+            👆👇👈👉 Dedo índice direccional | 🚀 SPACE = Hipervelocidad<br>
+            Objetivo: Recolecta todos los objetos azules y llega a la meta amarilla
+        </div>
+    </div>
+
+    <div id="gameOver" style="display: none;">
+        <h2>¡NIVEL COMPLETADO!</h2>
+        <div id="levelStats">
+            <p>⏱️ Tiempo: <span id="completionTime">0</span>s</p>
+            <p>💀 Muertes: <span id="totalDeaths">0</span></p>
+            <p id="newRecord" style="display: none;">🏆 ¡NUEVO RÉCORD!</p>
+        </div>
+        <div id="gameOverButtons">
+            <button class="menu-button" onclick="nextLevel()">➡️ SIGUIENTE NIVEL</button>
+            <button class="menu-button" onclick="restartLevel()">🔄 REINTENTAR</button>
+            <button class="menu-button" onclick="showLevelMenu()">📋 MENÚ NIVELES</button>
+        </div>
+    </div>
+
+
+
+
+    <!-- Menú de Misiones -->
+    <div id="missionsMenu" style="display: none;">
+        <div id="missionsTitle">🏆 MISIONES</div>
+        <div id="missionsContainer">
+            <div id="missionsList">
+                <!-- Las misiones se generarán dinámicamente -->
+            </div>
+            <div id="missionsStats">
+                <h4>📊 Estadísticas</h4>
+                <div class="mission-stat">
+                    <span>Misiones Completadas:</span>
+                    <span id="completedMissions">0/20</span>
+                </div>
+                <div class="mission-stat">
+                    <span>Puntos de Misión:</span>
+                    <span id="missionPoints">0</span>
+                </div>
+                <div class="mission-stat">
+                    <span>Rango Actual:</span>
+                    <span id="currentRank">Novato</span>
+                </div>
+            </div>
+        </div>
+        <div id="missionsButtons">
+            <button class="menu-button" onclick="closeMissions()">✅ CERRAR</button>
+            <button class="menu-button" onclick="resetMissions()">🔄 REINICIAR MISIONES</button>
+        </div>
+    </div>
+
+    <!-- Controles Móviles -->
+    <div id="mobileControls">
+        <div class="mobile-control-pad">
+            <div class="mobile-dpad">
+                <div class="mobile-btn up" id="mobileUp">↑</div>
+                <div class="mobile-btn down" id="mobileDown">↓</div>
+                <div class="mobile-btn left" id="mobileLeft">←</div>
+                <div class="mobile-btn right" id="mobileRight">→</div>
+            </div>
+            <div class="mobile-action-buttons">
+                <div class="mobile-action-btn" id="mobileHyperSpeed">🚀<br>TURBO</div>
+                <div class="mobile-action-btn mobile-menu-btn" id="mobileLevels">📋<br>NIVELES</div>
+                <div class="mobile-action-btn mobile-menu-btn" id="mobileSettings">⚙️<br>AJUSTES</div>
+                <div class="mobile-action-btn mobile-menu-btn" id="mobileMissions">🏆<br>MISIONES</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Joystick Virtual (alternativo) -->
+    <div id="virtualJoystick" style="display: none;">
+        <div class="joystick-knob" id="joystickKnob"></div>
+    </div>
+
+    <!-- Botones de Acción Móvil (alternativo) -->
+    <div id="mobileActionButtons">
+        <div class="mobile-action-btn" id="mobileHyperSpeed2">🚀</div>
+        <div class="mobile-action-btn mobile-menu-btn" id="mobileLevels2">📋</div>
+        <div class="mobile-action-btn mobile-menu-btn" id="mobileSettings2">⚙️</div>
+    </div>
+
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
+    <script src="dist/gesture-game.js"></script>
+</body>
+
+</html>

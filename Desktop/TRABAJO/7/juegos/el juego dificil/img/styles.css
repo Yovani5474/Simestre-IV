@@ -1,0 +1,976 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 10px;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Courier New', monospace;
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+}
+
+#gameContainer {
+    text-align: center;
+    width: 100%;
+    max-width: 820px;
+}
+
+#gameCanvas {
+    border: 2px solid #fff;
+    background: #111;
+    max-width: 100%;
+    height: auto;
+    touch-action: none;
+}
+
+#cameraContainer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 200px;
+    height: 150px;
+    border: 2px solid #00ff88;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#videoElement {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+
+#ui {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#title {
+    font-size: clamp(18px, 4vw, 24px);
+    margin-bottom: 10px;
+    color: #ff0000;
+    text-shadow: 2px 2px 4px #000;
+}
+
+.stat {
+    font-size: clamp(14px, 3vw, 16px);
+    color: #fff;
+    flex: 1;
+    min-width: 80px;
+}
+
+#gameOver {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 20px;
+    border: 2px solid #ff0000;
+    display: none;
+    z-index: 1000;
+    text-align: center;
+    max-width: 90vw;
+}
+
+#instructions {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    max-width: 100%;
+}
+
+#cameraPermission {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 20px;
+    border: 2px solid #00ff88;
+    border-radius: 10px;
+    z-index: 2000;
+    text-align: center;
+    max-width: 90vw;
+}
+
+.permission-button {
+    background: #00ff88;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.permission-button:hover {
+    background: #00cc66;
+}
+
+/* Estilos para el menú de niveles */
+#levelMenu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 20px;
+    border: 2px solid #00ff88;
+    border-radius: 10px;
+    z-index: 2000;
+    text-align: center;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#levelMenuTitle {
+    font-size: 24px;
+    color: #00ff88;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px #000;
+}
+
+#levelGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.level-card {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.level-card.unlocked {
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    color: #000;
+    border-color: #00ff88;
+}
+
+.level-card.locked {
+    background: #333;
+    color: #666;
+    border-color: #555;
+    cursor: not-allowed;
+}
+
+.level-card.completed {
+    background: linear-gradient(135deg, #ffff00, #cccc00);
+    color: #000;
+    border-color: #ffff00;
+}
+
+.level-card.current {
+    border-color: #ff0000;
+    box-shadow: 0 0 15px #ff0000;
+}
+
+.level-card:hover.unlocked {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #00ff88;
+}
+
+.level-number {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.level-status {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.level-time {
+    font-size: 10px;
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.menu-button {
+    background: #00ff88;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background 0.3s ease;
+}
+
+.menu-button:hover {
+    background: #00cc66;
+}
+
+#gameHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 10px;
+}
+
+#levelInfo {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Estilos para el menú de ajustes */
+#settingsMenu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 30px;
+    border: 2px solid #00ff88;
+    border-radius: 15px;
+    z-index: 2500;
+    text-align: left;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 90vw;
+}
+
+#settingsTitle {
+    font-size: 24px;
+    color: #00ff88;
+    margin-bottom: 25px;
+    text-align: center;
+    text-shadow: 2px 2px 4px #000;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-section h3 {
+    color: #00ff88;
+    margin-bottom: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 8px 0;
+}
+
+.setting-label {
+    color: #fff;
+    font-size: 14px;
+    flex: 1;
+}
+
+.setting-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 25px;
+    background: #333;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch.active {
+    background: #00ff88;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 21px;
+    height: 21px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.toggle-switch.active .toggle-slider {
+    transform: translateX(25px);
+}
+
+.volume-slider {
+    width: 100px;
+    height: 5px;
+    background: #333;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #00ff88;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.theme-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.theme-option {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.theme-option.active {
+    border-color: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+.theme-dark {
+    background: linear-gradient(135deg, #000, #333);
+}
+
+.theme-light {
+    background: linear-gradient(135deg, #fff, #f0f0f0);
+    color: #000;
+}
+
+.theme-neon {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+    color: #00ff88;
+}
+
+.theme-retro {
+    background: linear-gradient(135deg, #2d1b69, #11998e);
+    color: #fff;
+}
+
+.control-key {
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 12px;
+    border: 1px solid #555;
+}
+
+.settings-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+}
+
+/* Temas */
+body.theme-light {
+    background: linear-gradient(135deg, #f0f0f0, #fff);
+    color: #000;
+}
+
+body.theme-light #gameCanvas {
+    border-color: #333;
+}
+
+body.theme-light .stat {
+    color: #000;
+}
+
+body.theme-neon {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+    color: #00ff88;
+}
+
+body.theme-neon #title {
+    color: #ff0080;
+    text-shadow: 0 0 20px #ff0080;
+}
+
+body.theme-retro {
+    background: linear-gradient(135deg, #2d1b69, #11998e);
+    color: #fff;
+}
+
+body.theme-retro #title {
+    color: #ffd700;
+    text-shadow: 0 0 20px #ffd700;
+}
+
+/* Controles móviles */
+#mobileControls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 1000;
+}
+
+.mobile-control-pad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-dpad {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    border: 2px solid #00ff88;
+}
+
+.mobile-btn {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 255, 136, 0.8);
+    border: 2px solid #00ff88;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+    user-select: none;
+    touch-action: manipulation;
+    transition: all 0.1s ease;
+}
+
+.mobile-btn:active {
+    background: #00ff88;
+    transform: scale(0.9);
+}
+
+.mobile-btn.up {
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.mobile-btn.down {
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.mobile-btn.left {
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.mobile-btn.right {
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.mobile-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.mobile-action-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 0, 0.8);
+    border: 2px solid #ffff00;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-size: 12px;
+    user-select: none;
+    touch-action: manipulation;
+    transition: all 0.1s ease;
+}
+
+.mobile-action-btn:active {
+    background: #ffff00;
+    transform: scale(0.9);
+}
+
+.mobile-menu-btn {
+    background: rgba(0, 136, 255, 0.8);
+    border-color: #0088ff;
+}
+
+.mobile-menu-btn:active {
+    background: #0088ff;
+}
+
+/* Joystick virtual */
+#virtualJoystick {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 100px;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #00ff88;
+    border-radius: 50%;
+    display: none;
+    z-index: 1000;
+}
+
+.joystick-knob {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #00ff88;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.1s ease;
+}
+
+/* Botones de acción móvil */
+#mobileActionButtons {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+}
+
+/* Adaptaciones para pantallas móviles */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+        overflow-x: hidden;
+    }
+
+    #gameCanvas {
+        max-width: 100vw;
+        max-height: 60vh;
+        width: auto;
+        height: auto;
+    }
+
+    #gameContainer {
+        padding: 0;
+        margin: 0;
+    }
+
+    #gameHeader {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    #gameHeader>div {
+        display: flex;
+        gap: 10px;
+    }
+
+    #title {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    #ui {
+        flex-direction: row;
+        justify-content: space-around;
+        margin-top: 5px;
+        gap: 5px;
+    }
+
+    .stat {
+        font-size: 12px;
+        min-width: 60px;
+    }
+
+    #cameraContainer {
+        width: 120px;
+        height: 90px;
+        top: 5px;
+        right: 5px;
+    }
+
+    #levelMenu,
+    #settingsMenu {
+        width: 95vw;
+        max-height: 85vh;
+        padding: 15px;
+    }
+
+    #levelGrid {
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        gap: 8px;
+    }
+
+    .level-card {
+        width: 50px;
+        height: 50px;
+    }
+
+    .level-number {
+        font-size: 12px;
+    }
+
+    .level-status {
+        font-size: 8px;
+    }
+
+    .level-time {
+        font-size: 7px;
+    }
+
+    .settings-section {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .setting-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .menu-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    #instructions {
+        font-size: 10px;
+        padding: 8px;
+    }
+
+    /* Mostrar controles móviles */
+    #mobileControls {
+        display: block;
+    }
+
+    /* Ocultar algunos elementos en móvil */
+    #cameraPermission {
+        width: 95vw;
+        padding: 15px;
+    }
+
+    .permission-button {
+        padding: 8px 15px;
+        font-size: 14px;
+        margin: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    #gameCanvas {
+        max-height: 50vh;
+    }
+
+    #title {
+        font-size: 14px;
+    }
+
+    .stat {
+        font-size: 10px;
+    }
+
+    #mobileControls .mobile-dpad {
+        width: 100px;
+        height: 100px;
+    }
+
+    #mobileControls .mobile-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .mobile-action-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 10px;
+    }
+}
+
+/* Estilos para el menú de misiones */
+#missionsMenu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 25px;
+    border: 2px solid #ffd700;
+    border-radius: 15px;
+    z-index: 2500;
+    text-align: left;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 90vw;
+}
+
+#missionsTitle {
+    font-size: 24px;
+    color: #ffd700;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 2px 2px 4px #000;
+}
+
+#missionsContainer {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+#missionsList {
+    flex: 2;
+    min-width: 300px;
+}
+
+#missionsStats {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.mission-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.mission-item.completed {
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.mission-item.active {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.mission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.mission-title {
+    font-weight: bold;
+    color: #fff;
+    font-size: 14px;
+}
+
+.mission-reward {
+    background: #ffd700;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mission-description {
+    color: #ccc;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.mission-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mission-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #333;
+    border-radius: 3px;
+    margin-right: 10px;
+    overflow: hidden;
+}
+
+.mission-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff88, #ffd700);
+    transition: width 0.3s ease;
+}
+
+.mission-progress-text {
+    font-size: 11px;
+    color: #fff;
+    min-width: 40px;
+}
+
+.mission-stat {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.mission-stat span:first-child {
+    color: #ccc;
+}
+
+.mission-stat span:last-child {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+#missionsButtons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #333;
+}
+
+/* Notificación de misión */
+.mission-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 215, 0, 0.95);
+    color: #000;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #ffd700;
+    z-index: 3000;
+    max-width: 300px;
+    animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Orientación horizontal en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    #gameCanvas {
+        max-height: 70vh;
+    }
+
+    #mobileControls {
+        bottom: 10px;
+    }
+
+    #gameHeader {
+        margin-bottom: 5px;
+    }
+
+    #ui {
+        margin-top: 2px;
+    }
+}
+
+@media (max-width: 768px) {
+    #cameraContainer {
+        width: 150px;
+        height: 112px;
+    }
+
+    #levelGrid {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+        gap: 10px;
+    }
+
+    .level-card {
+        width: 60px;
+        height: 60px;
+    }
+
+    .level-number {
+        font-size: 14px;
+    }
+}

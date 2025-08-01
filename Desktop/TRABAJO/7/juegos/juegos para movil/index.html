@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎮 Neon Ball - Juego Móvil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(1.1);
+            }
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 500px;
+            max-height: 800px;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow:
+                0 0 50px rgba(78, 205, 196, 0.3),
+                0 0 100px rgba(255, 107, 107, 0.2),
+                inset 0 0 50px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(78, 205, 196, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+            border-radius: 13px;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            z-index: 10;
+            background:
+                linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+            padding: 30px;
+            border-radius: 20px;
+            display: none;
+            border: 2px solid rgba(78, 205, 196, 0.6);
+            box-shadow:
+                0 0 30px rgba(78, 205, 196, 0.4),
+                inset 0 0 30px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            animation: instructionGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes instructionGlow {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 0 30px rgba(78, 205, 196, 0.4),
+                    inset 0 0 30px rgba(255, 255, 255, 0.1);
+            }
+
+            50% {
+                box-shadow:
+                    0 0 40px rgba(78, 205, 196, 0.6),
+                    inset 0 0 40px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .instructions.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .instructions h2 {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #4ecdc4, #ff6b6b, #ffeb3b);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .instructions p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .difficulty-badge {
+            background: linear-gradient(45deg, #ff4757, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 900;
+            margin: 15px 0;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow:
+                0 0 20px rgba(255, 71, 87, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: difficultyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes difficultyPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow:
+                    0 0 20px rgba(255, 71, 87, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow:
+                    0 0 30px rgba(255, 71, 87, 0.8),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow:
+                0 5px 15px rgba(78, 205, 196, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 25px rgba(78, 205, 196, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+            box-shadow:
+                0 3px 10px rgba(78, 205, 196, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .game-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #4ecdc4, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+            z-index: 5;
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+
+            0%,
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.05);
+            }
+        }
+
+        .controls-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: center;
+            z-index: 5;
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                border-radius: 0;
+                max-width: none;
+                max-height: none;
+                border: none;
+            }
+
+            .instructions {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+
+            .game-title {
+                font-size: 20px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(78, 205, 196, 0.3);
+            border-top: 3px solid #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="game-title">🎮 NEON BALL</div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="controls-hint">Desliza para mover la paleta • Mantén la pelota en juego</div>
+
+        <div class="instructions" id="instructions">
+            <h2>🌟 ¡Neon Ball! 🌟</h2>
+            <div class="difficulty-badge">🔥 DIFICULTAD: 80% 🔥</div>
+            <p>🎯 Mueve la paleta deslizando tu dedo</p>
+            <p>⚡ Crea combos para más puntos</p>
+            <p>🚀 La velocidad aumenta con tu puntuación</p>
+            <p>⚠️ ¡Modo desafiante activado!</p>
+            <button class="start-button" onclick="startGame()">🎮 Comenzar Juego</button>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <script src="dist/game.js"></script>
+
+    <script>
+        function startGame() {
+            const instructions = document.getElementById('instructions');
+            const loading = document.getElementById('loading');
+
+            instructions.style.display = 'none';
+            loading.style.display = 'block';
+
+            setTimeout(() => {
+                loading.style.display = 'none';
+            }, 1000);
+        }
+
+        // Show instructions initially with delay
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('instructions').classList.add('show');
+            }, 500);
+        });
+
+        // Add some interactive background effects
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            document.body.style.background = `
+                radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at ${(1 - x) * 100}% ${(1 - y) * 100}%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)
+            `;
+        });
+    </script>
+</body>
+
+</html>

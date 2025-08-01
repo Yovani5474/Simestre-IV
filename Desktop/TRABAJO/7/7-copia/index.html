@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>El Juego Más Difícil del Mundo - Control por Gestos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #gameContainer {
+            text-align: center;
+            width: 100%;
+            max-width: 820px;
+        }
+
+        #gameCanvas {
+            border: 2px solid #fff;
+            background: #111;
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+        }
+
+        #cameraContainer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 200px;
+            height: 150px;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        #gestureStatus {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #00ff88;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .gesture-indicator {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .gesture-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .active {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .inactive {
+            background: #333;
+            color: #666;
+        }
+
+        #ui {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #title {
+            font-size: clamp(18px, 4vw, 24px);
+            margin-bottom: 10px;
+            color: #ff0000;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .stat {
+            font-size: clamp(14px, 3vw, 16px);
+            color: #fff;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border: 2px solid #ff0000;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+            max-width: 90vw;
+        }
+
+        #instructions {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-width: 100%;
+        }
+
+        #cameraPermission {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            z-index: 2000;
+            text-align: center;
+            max-width: 90vw;
+        }
+
+        .permission-button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .permission-button:hover {
+            background: #00cc66;
+        }
+
+        @media (max-width: 768px) {
+            #cameraContainer {
+                width: 150px;
+                height: 112px;
+            }
+
+            #gestureStatus {
+                font-size: 12px;
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cameraPermission">
+        <h2>🎮 Control por Gestos</h2>
+        <p>Este juego usa reconocimiento de gestos con tu cámara</p>
+        <p><strong>Gestos de control:</strong></p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>👆 Dedo índice arriba = Mover arriba</li>
+            <li>👇 Dedo índice abajo = Mover abajo</li>
+            <li>👈 Dedo índice izquierda = Mover izquierda</li>
+            <li>👉 Dedo índice derecha = Mover derecha</li>
+            <li>✋ Mano abierta = Pausa</li>
+        </ul>
+        <button class="permission-button" onclick="startCamera()">Activar Cámara y Jugar</button>
+        <button class="permission-button" onclick="playWithoutCamera()">Jugar sin Gestos</button>
+    </div>
+
+    <div id="gameContainer">
+        <div id="title">EL JUEGO MÁS DIFÍCIL - CONTROL POR GESTOS</div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui">
+            <div class="stat">Nivel: <span id="level">1</span></div>
+            <div class="stat">Muertes: <span id="deaths">0</span></div>
+            <div class="stat">Tiempo: <span id="time">0</span></div>
+        </div>
+        <div id="gameOver">
+            <h2>¡GAME OVER!</h2>
+            <p>Haz gesto de mano abierta para reintentar</p>
+            <p>O presiona ESPACIO en teclado</p>
+        </div>
+        <div id="instructions">
+            <strong>Controles por Gestos:</strong><br>
+            👆👇👈👉 Dedo índice en direcciones<br>
+            ✋ Mano abierta para pausar/reiniciar<br>
+            Objetivo: Recolecta todos los objetos azules y llega a la meta amarilla
+        </div>
+    </div>
+
+    <!-- Cámara para gestos -->
+    <div id="cameraContainer" style="display: none;">
+        <video id="videoElement" autoplay muted playsinline></video>
+    </div>
+
+    <!-- Estado de gestos -->
+    <div id="gestureStatus" style="display: none;">
+        <div class="gesture-indicator">
+            <div class="gesture-icon inactive" id="upGesture">↑</div>
+            <span>Arriba</span>
+        </div>
+        <div class="gesture-indicator">
+            <div class="gesture-icon inactive" id="downGesture">↓</div>
+            <span>Abajo</span>
+        </div>
+        <div class="gesture-indicator">
+            <div class="gesture-icon inactive" id="leftGesture">←</div>
+            <span>Izquierda</span>
+        </div>
+        <div class="gesture-indicator">
+            <div class="gesture-icon inactive" id="rightGesture">→</div>
+            <span>Derecha</span>
+        </div>
+        <div class="gesture-indicator">
+            <div class="gesture-icon inactive" id="pauseGesture">✋</div>
+            <span>Pausa</span>
+        </div>
+    </div>
+
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
+    <script src="gesture-game.js"></script>
+</body>
+
+</html>

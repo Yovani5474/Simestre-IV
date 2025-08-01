@@ -1,0 +1,14 @@
+{
+  "name": "mobile-game-typescript",
+  "version": "1.0.0",
+  "description": "Mobile game built with TypeScript",
+  "main": "dist/game.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "serve": "python -m http.server 8000"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
