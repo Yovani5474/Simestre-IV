@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Matemáticas Básicas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Alinea al inicio para que no se centre verticalmente demasiado */
+            min-height: 100vh;
+            /* Asegura que el body ocupe al menos toda la altura de la ventana */
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            /* Margen superior para que no esté pegado al borde */
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 35px;
+            font-size: 2.2em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #ebf0f5;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #34495e;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+        }
+
+        .options label {
+            display: block;
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            background-color: #fefefe;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            display: flex;
+            /* Para alinear el radio button y el texto */
+            align-items: center;
+        }
+
+        .options label:hover {
+            background-color: #e9f0f7;
+            border-color: #a7c8ed;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .options input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.3);
+            /* Aumenta el tamaño del radio button */
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            line-height: 1.5;
+            display: none;
+            /* Oculto por defecto */
+        }
+
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        button {
+            display: block;
+            width: 180px;
+            padding: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 30px auto 0 auto;
+            /* Centrar el botón */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            text-align: center;
+            font-size: 1.8em;
+            margin-top: 40px;
+            font-weight: bold;
+            color: #28a745;
+            padding: 20px;
+            background-color: #e9ffe9;
+            border-radius: 10px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .hint {
+            font-size: 0.95em;
+            color: #6a7c8f;
+            margin-top: 15px;
+            font-style: italic;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-left: 4px solid #87ceeb;
+            border-radius: 5px;
+        }
+
+        /* Estilos específicos para MathJax, si se llegara a usar un renderizador */
+        .question-text .MathJax_Display,
+        .options label .MathJax_Display {
+            display: inline-block !important;
+            margin: 0 !important;
+        }
+    </style>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+      });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Examen de Matemáticas Básicas</h1>
+        <div style="text-align: center; margin-bottom: 20px; color: #666;">
+            <p>Pregunta <span id="question-counter">1</span> | Correctas: <span id="correct-counter">0</span> |
+                Porcentaje: <span id="percentage">0%</span></p>
+            <p><span id="level-indicator"
+                    style="background-color: #007bff; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">🎯
+                    Nivel: Básico</span></p>
+        </div>
+        <div id="quiz-container">
+            <div class="question-container">
+                <div class="question-text" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="hint" id="hint"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+                <button id="next-button">Siguiente Pregunta</button>
+                <button id="report-button" style="background-color: #28a745;">📊 Ver Avances</button>
+            </div>
+        </div>
+        <div class="results" id="results" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Generadores de preguntas aleatorias
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function shuffle(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Tipos de preguntas para estadísticas
+        const questionTypes = [
+            'Operaciones Básicas',
+            'Evaluación de Expresiones',
+            'Ecuaciones Lineales',
+            'Área de Triángulos',
+            'Raíces Cuadradas',
+            'Área del Círculo',
+            'Potencias',
+            'Pendientes'
+        ];
+
+        // Generadores de diferentes tipos de preguntas
+        const questionGenerators = [
+            // Operaciones básicas
+            function () {
+                const a = getRandomInt(1, 10);
+                const b = getRandomInt(1, 10);
+                const c = getRandomInt(1, 10);
+                const correct = a + b * c;
+                const wrong1 = (a + b) * c;
+                const wrong2 = a * b + c;
+                const wrong3 = a + b + c;
+
+                return {
+                    question: `¿Cuál es el resultado de $${a} + ${b} \\times ${c}$?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `Siguiendo el orden de operaciones, primero se multiplica: $${b} \\times ${c} = ${b * c}$, luego se suma: $${a} + ${b * c} = ${correct}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `Este resultado se obtendría si se suma primero: $(${a} + ${b}) \\times ${c} = ${wrong1}$, pero no es el orden correcto.` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este resultado no sigue el orden correcto de operaciones.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este resultado ignora la multiplicación y solo suma todos los números.` }
+                    ]),
+                    hint: "Recuerda el orden de las operaciones: primero multiplicación y división, luego suma y resta."
+                };
+            },
+
+            // Evaluación de expresiones
+            function () {
+                const x = getRandomInt(1, 8);
+                const a = getRandomInt(2, 5);
+                const b = getRandomInt(1, 10);
+                const correct = a * x + b;
+                const wrong1 = x + b;
+                const wrong2 = a + x + b;
+                const wrong3 = a * x * b;
+
+                return {
+                    question: `Si $x = ${x}$, ¿cuál es el valor de $${a}x + ${b}$?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `Sustituyendo $x = ${x}$: $${a}(${x}) + ${b} = ${a * x} + ${b} = ${correct}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `Este sería el resultado si solo se sumara $x + ${b} = ${x} + ${b} = ${wrong1}$.` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este resultado no considera la multiplicación correctamente.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este resultado multiplica todos los términos incorrectamente.` }
+                    ]),
+                    hint: "Sustituye el valor de x en la expresión y realiza las operaciones paso a paso."
+                };
+            },
+
+            // Ecuaciones lineales
+            function () {
+                const a = getRandomInt(2, 6);
+                const b = getRandomInt(2, 20);
+                const correct = b / a;
+                const wrong1 = -correct;
+                const wrong2 = b;
+                const wrong3 = a;
+
+                return {
+                    question: `¿Cuál es la solución de la ecuación $${a}x - ${b} = 0$?`,
+                    options: shuffle([
+                        { text: `$x = ${correct}$`, isCorrect: true, rationale: `Despejando: $${a}x = ${b}$, por lo tanto $x = \\frac{${b}}{${a}} = ${correct}$.` },
+                        { text: `$x = ${wrong1}$`, isCorrect: false, rationale: `Este sería el resultado si la ecuación fuera $${a}x + ${b} = 0$.` },
+                        { text: `$x = ${wrong2}$`, isCorrect: false, rationale: `Este resultado no considera la división por ${a}.` },
+                        { text: `$x = ${wrong3}$`, isCorrect: false, rationale: `Este no es el valor correcto que satisface la ecuación.` }
+                    ]),
+                    hint: "Despeja x moviendo el término constante al otro lado de la ecuación."
+                };
+            },
+
+            // Área de triángulos
+            function () {
+                const base = getRandomInt(3, 12);
+                const altura = getRandomInt(2, 10);
+                const correct = (base * altura) / 2;
+                const wrong1 = base * altura;
+                const wrong2 = base + altura;
+                const wrong3 = 2 * (base + altura);
+
+                return {
+                    question: `¿Cuál es el área de un triángulo con base $${base}$ y altura $${altura}$?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `El área de un triángulo es $A = \\frac{1}{2} \\times \\text{base} \\times \\text{altura} = \\frac{1}{2} \\times ${base} \\times ${altura} = ${correct}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `Este sería el resultado si no se dividiera por 2.` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este resultado se obtendría sumando base y altura.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este es el perímetro de un rectángulo, no el área del triángulo.` }
+                    ]),
+                    hint: "Recuerda que el área del triángulo es base por altura dividido entre 2."
+                };
+            },
+
+            // Raíces cuadradas
+            function () {
+                const numbers = [4, 9, 16, 25, 36, 49, 64, 81, 100];
+                const num = numbers[getRandomInt(0, numbers.length - 1)];
+                const correct = Math.sqrt(num);
+                const wrong1 = num / 2;
+                const wrong2 = num * 2;
+                const wrong3 = num;
+
+                return {
+                    question: `¿Cuál es el valor de $\\sqrt{${num}}$?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `La raíz cuadrada de ${num} es ${correct}, porque $${correct}^2 = ${num}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `Este sería el resultado de dividir ${num} entre 2.` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este sería el resultado de multiplicar ${num} por 2.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este es el número original, no su raíz cuadrada.` }
+                    ]),
+                    hint: "Piensa en qué número multiplicado por sí mismo da " + num + "."
+                };
+            },
+
+            // Área del círculo
+            function () {
+                const radio = getRandomInt(2, 8);
+                const correct = `${radio * radio}\\pi`;
+                const wrong1 = `${2 * radio}\\pi`;
+                const wrong2 = `${radio}\\pi`;
+                const wrong3 = `${radio * radio * 2}\\pi`;
+
+                return {
+                    question: `Si un círculo tiene radio $r = ${radio}$, ¿cuál es su área?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `El área de un círculo es $A = \\pi r^2 = \\pi \\times ${radio}^2 = ${correct}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `Este sería el perímetro del círculo: $2\\pi r = ${wrong1}$.` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este resultado no corresponde a la fórmula del área.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este resultado es incorrecto para el área del círculo.` }
+                    ]),
+                    hint: "El área del círculo es π multiplicado por el radio al cuadrado."
+                };
+            },
+
+            // Potencias
+            function () {
+                const bases = [-4, -3, -2, 2, 3, 4, 5];
+                const base = bases[getRandomInt(0, bases.length - 1)];
+                const exp = 2;
+                const correct = Math.pow(base, exp);
+                const wrong1 = -correct;
+                const wrong2 = base * exp;
+                const wrong3 = base + exp;
+
+                return {
+                    question: `¿Cuál es el resultado de $(${base})^${exp}$?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `Al elevar ${base < 0 ? 'un número negativo' : base} al cuadrado: $(${base})^2 = ${base} \\times ${base} = ${correct}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `${base < 0 ? 'Un número negativo elevado a una potencia par da resultado positivo.' : 'Este sería el resultado negativo, pero la potencia es positiva.'}` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este resultado confunde potenciación con multiplicación.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este resultado confunde potenciación con suma.` }
+                    ]),
+                    hint: base < 0 ? "Recuerda que un número negativo elevado a una potencia par da un resultado positivo." : "Multiplica el número por sí mismo."
+                };
+            },
+
+            // Pendientes
+            function () {
+                const x1 = getRandomInt(1, 5);
+                const y1 = getRandomInt(1, 8);
+                const x2 = x1 + getRandomInt(1, 4);
+                const y2 = y1 + getRandomInt(2, 8);
+                const correct = (y2 - y1) / (x2 - x1);
+                const wrong1 = (y2 - y1);
+                const wrong2 = (x2 - x1);
+                const wrong3 = (x2 - x1) / (y2 - y1);
+
+                return {
+                    question: `¿Cuál es la pendiente de la recta que pasa por los puntos $(${x1}, ${y1})$ y $(${x2}, ${y2})$?`,
+                    options: shuffle([
+                        { text: `$${correct}$`, isCorrect: true, rationale: `La pendiente se calcula como $m = \\frac{y_2 - y_1}{x_2 - x_1} = \\frac{${y2} - ${y1}}{${x2} - ${x1}} = \\frac{${y2 - y1}}{${x2 - x1}} = ${correct}$.` },
+                        { text: `$${wrong1}$`, isCorrect: false, rationale: `Este es el numerador de la fracción, pero falta dividir por el cambio en x.` },
+                        { text: `$${wrong2}$`, isCorrect: false, rationale: `Este es el denominador de la fracción, no la pendiente completa.` },
+                        { text: `$${wrong3}$`, isCorrect: false, rationale: `Este sería el resultado si se invirtiera la fracción.` }
+                    ]),
+                    hint: "La pendiente es el cambio en y dividido por el cambio en x."
+                };
+            }
+        ];
+
+        let questionCount = 0;
+        let score = 0;
+        let answeredCurrentQuestion = false;
+        let currentQuestion = null;
+        let startTime = new Date();
+        let sessionStats = {
+            correctByType: {},
+            totalByType: {}
+        };
+
+
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const hintElement = document.getElementById('hint');
+        const feedbackElement = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const resultsElement = document.getElementById('results');
+        const quizContainer = document.getElementById('quiz-container');
+        const questionCounter = document.getElementById('question-counter');
+        const correctCounter = document.getElementById('correct-counter');
+        const percentageElement = document.getElementById('percentage');
+        const reportButton = document.getElementById('report-button');
+
+
+        function generateQuestion() {
+            const typeIndex = getRandomInt(0, questionGenerators.length - 1);
+            const generator = questionGenerators[typeIndex];
+            const question = generator();
+            question.type = questionTypes[typeIndex];
+            return question;
+        }
+
+        function updateStats() {
+            const percentage = questionCount > 0 ? Math.round((score / questionCount) * 100) : 0;
+            percentageElement.textContent = percentage + '%';
+        }
+
+        function loadQuestion() {
+            answeredCurrentQuestion = false;
+            feedbackElement.style.display = 'none';
+            feedbackElement.className = 'feedback';
+            nextButton.textContent = 'Siguiente Pregunta';
+
+            questionCount++;
+            questionCounter.textContent = questionCount;
+            correctCounter.textContent = score;
+            updateStats();
+
+            currentQuestion = generateQuestion();
+
+            // Inicializar estadísticas por tipo si no existen
+            if (!sessionStats.totalByType[currentQuestion.type]) {
+                sessionStats.totalByType[currentQuestion.type] = 0;
+                sessionStats.correctByType[currentQuestion.type] = 0;
+            }
+            sessionStats.totalByType[currentQuestion.type]++;
+
+
+
+            questionElement.innerHTML = currentQuestion.question;
+            hintElement.innerHTML = `**Pista:** ${currentQuestion.hint}`;
+            optionsElement.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const label = document.createElement('label');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'answer';
+                input.value = index;
+                input.onclick = () => checkAnswer(option, input);
+
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(option.text));
+                optionsElement.appendChild(label);
+            });
+
+            // Renderiza las ecuaciones MathJax después de cargar el contenido
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, quizContainer]);
+        }
+
+        function checkAnswer(selectedOption, radioInput) {
+            if (answeredCurrentQuestion) return;
+
+            answeredCurrentQuestion = true;
+
+            // Deshabilita todos los radio buttons después de seleccionar una respuesta
+            document.querySelectorAll('input[name="answer"]').forEach(radio => {
+                radio.disabled = true;
+            });
+
+            feedbackElement.style.display = 'block';
+            if (selectedOption.isCorrect) {
+                score++;
+                sessionStats.correctByType[currentQuestion.type]++;
+                correctCounter.textContent = score;
+                feedbackElement.classList.add('correct');
+                feedbackElement.innerHTML = `¡**Correcto**! ${selectedOption.rationale}`;
+            } else {
+                feedbackElement.classList.add('incorrect');
+                const correctOption = currentQuestion.options.find(opt => opt.isCorrect);
+                feedbackElement.innerHTML = `**Incorrecto**. ${selectedOption.rationale}<br><br>La respuesta correcta es: **${correctOption.text}**. ${correctOption.rationale}`;
+            }
+
+            updateStats();
+            // Vuelve a renderizar MathJax en el feedback si contiene ecuaciones
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, feedbackElement]);
+        }
+
+        function generateReport() {
+            const currentTime = new Date();
+            const timeSpent = Math.round((currentTime - startTime) / 1000 / 60);
+            const percentage = questionCount > 0 ? Math.round((score / questionCount) * 100) : 0;
+
+            // Evaluación del rendimiento
+            let evaluation = '';
+            if (percentage >= 90) evaluation = '🌟 ¡Excelente! Dominio sobresaliente';
+            else if (percentage >= 80) evaluation = '🎯 ¡Muy bien! Buen dominio';
+            else if (percentage >= 70) evaluation = '👍 Bien, sigue practicando';
+            else if (percentage >= 60) evaluation = '📚 Regular, necesita más práctica';
+            else evaluation = '💪 Necesita reforzar conceptos básicos';
+
+            let report = `📊 INFORME DE AVANCES - MATEMÁTICAS BÁSICAS\n\n`;
+            report += `👤 Estudiante: Cachimbo\n`;
+            report += `📅 Fecha: ${currentTime.toLocaleDateString('es-ES')}\n`;
+            report += `⏰ Hora: ${currentTime.toLocaleTimeString('es-ES')}\n`;
+            report += `⏱️ Tiempo de estudio: ${timeSpent} minutos\n\n`;
+
+            report += `📈 RESUMEN GENERAL:\n`;
+            report += `• Total de preguntas: ${questionCount}\n`;
+            report += `• Respuestas correctas: ${score}\n`;
+            report += `• Respuestas incorrectas: ${questionCount - score}\n`;
+            report += `• Porcentaje de aciertos: ${percentage}%\n\n`;
+
+            report += `🎯 EVALUACIÓN: ${evaluation}\n\n`;
+
+            // Estadísticas por tipo de pregunta
+            report += `📊 DETALLE POR TEMA:\n`;
+            for (const type of questionTypes) {
+                if (sessionStats.totalByType[type] > 0) {
+                    const correct = sessionStats.correctByType[type] || 0;
+                    const total = sessionStats.totalByType[type];
+                    const typePercentage = Math.round((correct / total) * 100);
+                    report += `• ${type}: ${correct}/${total} (${typePercentage}%)\n`;
+                }
+            }
+
+            report += `\n💡 RECOMENDACIONES:\n`;
+
+            // Encontrar temas con menor rendimiento
+            let weakestTopics = [];
+            for (const type of questionTypes) {
+                if (sessionStats.totalByType[type] > 0) {
+                    const correct = sessionStats.correctByType[type] || 0;
+                    const total = sessionStats.totalByType[type];
+                    const typePercentage = (correct / total) * 100;
+                    if (typePercentage < 70) {
+                        weakestTopics.push(type);
+                    }
+                }
+            }
+
+            if (weakestTopics.length > 0) {
+                report += `• Reforzar: ${weakestTopics.join(', ')}\n`;
+            }
+
+            if (percentage < 80) {
+                report += `• Dedicar más tiempo a la práctica diaria\n`;
+                report += `• Revisar conceptos fundamentales\n`;
+            }
+
+            report += `• Continuar con la práctica regular\n`;
+            report += `• Consultar dudas con el profesor\n\n`;
+
+            report += `📱 Generado automáticamente por el Sistema de Práctica Matemática`;
+
+            return report;
+        }
+
+        function showReport() {
+            if (questionCount === 0) {
+                alert('Responde al menos una pregunta antes de generar el informe.');
+                return;
+            }
+
+            const report = generateReport();
+
+            // Crear ventana modal para mostrar el informe
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                position: relative;
+            `;
+
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '✕ Cerrar';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+            `;
+
+            const reportText = document.createElement('pre');
+            reportText.textContent = report;
+            reportText.style.cssText = `
+                white-space: pre-wrap;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 14px;
+                line-height: 1.5;
+                margin-top: 30px;
+            `;
+
+            closeButton.onclick = () => document.body.removeChild(modal);
+            modal.onclick = (e) => {
+                if (e.target === modal) document.body.removeChild(modal);
+            };
+
+            modalContent.appendChild(closeButton);
+            modalContent.appendChild(reportText);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (!answeredCurrentQuestion) {
+                alert('Por favor, selecciona una respuesta antes de continuar.');
+                return;
+            }
+            loadQuestion();
+        });
+
+        reportButton.addEventListener('click', showReport);
+
+        // Carga la primera pregunta al iniciar
+        loadQuestion();
+    </script>
+</body>
+
+</html>
