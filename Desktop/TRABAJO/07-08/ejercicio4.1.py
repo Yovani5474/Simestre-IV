@@ -10,11 +10,17 @@ x=[
    [55,8],
    [80,14]
 ]
-y=[1, 0, 1, 0 ]
+y=[1, 0, 1, 0, 1]
 
 modelo = DecisionTreeClassifier()
 modelo.fit(x,y)
 nuevo_alumno = [[100, 15]]  # Cambia los valores según lo que quieras predecir
 prediccion = modelo.predict(nuevo_alumno)
+
+if prediccion ==1:
+    print("Aprobado")
+else:
+    print("Reprobado")
+
 
 print(prediccion)
